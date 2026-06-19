@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Case Study 04 — Autonomous Post-Learning Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* ── TOKENS ── */
+:root {
+  --bg: #F4F5FB;
+  --surface: #FFFFFF;
+  --surface-2: #ECEEF7;
+  --border: #D8DCF0;
+  --text-primary: #0F1340;
+  --text-secondary: #4A5080;
+  --text-muted: #8890B8;
+  --accent: #2D3FBE;
+  --accent-light: #E0E4F9;
+  --accent-dark: #1A2578;
+  --purple: #7B2FBE;
+  --purple-light: #F0E6FA;
+  --purple-dark: #4A1580;
+  --amber: #A05C10;
+  --amber-light: #FEF0DC;
+  --gradient: linear-gradient(135deg, #2D3FBE 0%, #7B2FBE 100%);
+  --gradient-soft: linear-gradient(135deg, #E0E4F9 0%, #F0E6FA 100%);
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --shadow-sm: 0 1px 3px rgba(45,63,190,0.07), 0 1px 2px rgba(45,63,190,0.04);
+  --shadow-md: 0 4px 20px rgba(45,63,190,0.12);
+  --shadow-glow: 0 0 0 3px rgba(45,63,190,0.18);
+  --font-sans: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+[data-theme="dark"] {
+  --bg: #0B0D1A;
+  --surface: #131629;
+  --surface-2: #1C2038;
+  --border: #272B4A;
+  --text-primary: #E8EAFA;
+  --text-secondary: #8890B8;
+  --text-muted: #4A5080;
+  --accent: #6B7EFF;
+  --accent-light: #1A2050;
+  --accent-dark: #C0C8FF;
+  --purple: #B06AE0;
+  --purple-light: #2A1545;
+  --purple-dark: #E8CCFF;
+  --amber: #F0A030;
+  --amber-light: #2A1C08;
+  --gradient: linear-gradient(135deg, #6B7EFF 0%, #B06AE0 100%);
+  --gradient-soft: linear-gradient(135deg, #1A2050 0%, #2A1545 100%);
+}
+
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.6;
+  transition: background 0.2s, color 0.2s;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 56px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  gap: 1rem;
+}
+.nav-brand {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nav-controls { display: flex; align-items: center; gap: 0.5rem; }
+.lang-switch {
+  display: flex;
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+  gap: 2px;
+}
+.lang-btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.lang-btn.active {
+  background: var(--gradient);
+  color: #fff;
+}
+.theme-toggle {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── HERO ── */
+.hero {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 5rem 2rem 3rem;
+  text-align: center;
+}
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+.hero-title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 300;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  margin-bottom: 1.25rem;
+  color: var(--text-primary);
+}
+.hero-title em {
+  font-style: italic;
+  font-weight: 400;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-desc {
+  font-size: 1.075rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  max-width: 580px;
+  margin: 0 auto 2rem;
+}
+.hero-badges {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.badge {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 99px;
+}
+.badge-accent { background: var(--accent-light); color: var(--accent); }
+.badge-purple { background: var(--purple-light); color: var(--purple); }
+.badge-amber  { background: var(--amber-light);  color: var(--amber);  }
+
+/* ── STATS ROW ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  max-width: 760px;
+  margin: 0 auto 4rem;
+}
+.stat-cell {
+  background: var(--surface);
+  padding: 1.5rem;
+  text-align: center;
+}
+.stat-number {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 500;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: block;
+  line-height: 1;
+  margin-bottom: 0.35rem;
+}
+.stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* ── SECTION ── */
+.section {
+  padding: 4rem 2rem;
+}
+.section-inner {
+  max-width: 800px;
+  margin: 0 auto;
+}
+.section-title {
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+.section-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+/* ── CONFIG PANEL ── */
+.config-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+.config-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.field-group { display: flex; flex-direction: column; gap: 0.5rem; }
+.field-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.field-value {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.field-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+input[type="range"] {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--surface-2);
+  border-radius: 99px;
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.stakeholder-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+.stakeholder-btn {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+.stakeholder-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.stakeholder-btn.active {
+  border-color: var(--purple);
+  color: var(--purple);
+  background: var(--purple-light);
+}
+.stakeholder-sub {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  display: block;
+  margin-top: 2px;
+}
+.generate-btn {
+  width: 100%;
+  padding: 0.9rem 2rem;
+  background: var(--gradient);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(123,47,190,0.25);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.generate-btn:hover { box-shadow: 0 4px 20px rgba(123,47,190,0.35); transform: translateY(-1px); }
+.generate-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* ── PROCESSING ── */
+.processing-bar {
+  display: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 2rem;
+  margin-top: 1.5rem;
+  align-items: center;
+  gap: 1rem;
+}
+.processing-bar.visible { display: flex; }
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.processing-text { font-size: 14px; color: var(--text-secondary); }
+.processing-step {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent);
+  margin-top: 2px;
+}
+
+/* ── OUTPUT SECTION ── */
+.output-section {
+  display: none;
+  padding: 0 2rem 4rem;
+}
+.output-section.visible { display: block; }
+.output-inner { max-width: 800px; margin: 0 auto; }
+
+/* ── TABS ── */
+.tabs-header {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+  overflow-x: auto;
+}
+.tab-btn {
+  padding: 0.85rem 1.25rem;
+  border: none;
+  background: none;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.tab-btn:hover { color: var(--text-primary); }
+.tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.tab-btn .tab-primary-dot {
+  display: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--purple);
+  flex-shrink: 0;
+}
+.tab-btn.primary-tab .tab-primary-dot {
+  display: inline-block;
+}
+.tab-btn.primary-tab {
+  color: var(--text-primary);
+}
+.tab-primary-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--purple);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-left: 0.25rem;
+}
+.tab-icon {
+  font-size: 14px;
+}
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── CHANNEL BADGE ── */
+.channel-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 99px;
+  margin-bottom: 1.25rem;
+}
+.channel-gmail { background: #FDE8E8; color: #C0392B; }
+.channel-notion { background: #E8E8E8; color: #333; }
+[data-theme="dark"] .channel-notion { background: #2A2A2A; color: #CCC; }
+.channel-teams { background: #E8EDF8; color: #2D4BB8; }
+
+/* ── EXECUTIVE REPORT ── */
+.report-frame {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+.report-frame h2 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  margin-top: 1.5rem;
+}
+.report-frame h2:first-child { margin-top: 0; }
+.report-frame h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  margin-top: 1.25rem;
+}
+.report-frame p { color: var(--text-secondary); margin-bottom: 0.75rem; font-size: 0.95rem; }
+.report-frame ul, .report-frame ol { padding-left: 1.25rem; color: var(--text-secondary); font-size: 0.95rem; }
+.report-frame li { margin-bottom: 0.4rem; }
+.report-frame strong { color: var(--text-primary); font-weight: 500; }
+
+/* ── ROI PANEL ── */
+.roi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.roi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+}
+.roi-card-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.roi-card-value {
+  font-family: var(--font-mono);
+  font-size: 1.75rem;
+  font-weight: 500;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.roi-card-sub { font-size: 12px; color: var(--text-muted); margin-top: 0.25rem; }
+.roi-bars { display: flex; flex-direction: column; gap: 0.75rem; }
+.roi-bar-row { display: flex; align-items: center; gap: 1rem; }
+.roi-bar-label { font-size: 13px; color: var(--text-secondary); width: 180px; flex-shrink: 0; }
+.roi-bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--surface-2);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.roi-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: var(--gradient);
+  transition: width 1s ease;
+}
+.roi-bar-val {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  width: 40px;
+  text-align: right;
+}
+
+/* ── PEDAGOGICAL AUDIT ── */
+.audit-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  white-space: pre-wrap;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  box-shadow: var(--shadow-sm);
+}
+.audit-block strong { color: var(--text-primary); }
+
+/* ── OPS ALERT ── */
+.ops-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+.ops-urgency-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+.urgency-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #E74C3C;
+  animation: pulse 1.5s ease infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.urgency-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.ops-body {
+  white-space: pre-wrap;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+}
+
+/* ── EXECUTIVE SUMMARY ── */
+.summary-card {
+  background: var(--gradient-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+}
+.summary-text {
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  line-height: 1.8;
+  font-weight: 400;
+}
+
+/* ── ARCHITECTURE SECTION ── */
+.arch-section {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 4rem 2rem;
+}
+.arch-inner { max-width: 800px; margin: 0 auto; }
+.arch-flow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+  padding: 1.5rem 0;
+}
+.arch-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+.arch-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+.arch-icon.highlight {
+  background: var(--gradient);
+  border-color: transparent;
+}
+.arch-name {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  text-align: center;
+  max-width: 72px;
+}
+.arch-arrow {
+  width: 32px;
+  height: 2px;
+  background: var(--border);
+  flex-shrink: 0;
+  position: relative;
+}
+.arch-arrow::after {
+  content: '';
+  position: absolute;
+  right: -1px;
+  top: -3px;
+  border: 4px solid transparent;
+  border-left: 6px solid var(--border);
+}
+
+/* ── WHAT HAPPENS NEXT ── */
+.next-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.next-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+}
+.next-card-icon { font-size: 20px; margin-bottom: 0.5rem; }
+.next-card-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+.next-card-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 2rem;
+  text-align: center;
+}
+.footer-stack {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .config-grid { grid-template-columns: 1fr; }
+  .stakeholder-row { grid-template-columns: 1fr; }
+  .roi-grid { grid-template-columns: 1fr; }
+  .next-grid { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: 1fr; }
+  .arch-flow { gap: 0; }
+  nav { padding: 0 1rem; }
+  .hero { padding: 3rem 1.25rem 2rem; }
+  .section { padding: 3rem 1.25rem; }
+}
+
+/* ── RICH TEXT FORMATTING ── */
+.rich-content h2 {
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 1.5rem 0 0.6rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+.rich-content h2:first-child { margin-top: 0; }
+.rich-content h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--accent);
+  margin: 1.25rem 0 0.4rem;
+}
+.rich-content p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.75;
+  margin-bottom: 0.75rem;
+}
+.rich-content ul, .rich-content ol {
+  padding-left: 0;
+  list-style: none;
+  margin-bottom: 0.75rem;
+}
+.rich-content li {
+  position: relative;
+  padding-left: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+.rich-content ul li::before {
+  content: '·';
+  position: absolute;
+  left: 0.4rem;
+  color: var(--accent);
+  font-size: 1.2rem;
+  line-height: 1.4;
+}
+.rich-content ol { counter-reset: rich-counter; }
+.rich-content ol li { counter-increment: rich-counter; }
+.rich-content ol li::before {
+  content: counter(rich-counter);
+  position: absolute;
+  left: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--accent);
+  background: var(--accent-light);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 3px;
+}
+.rich-content strong { color: var(--text-primary); font-weight: 500; }
+.rich-content em { color: var(--purple); font-style: normal; font-weight: 500; }
+
+/* Ops alert structured fields */
+
+.rich-content .section-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 1.5rem 0 0.5rem;
+}
+.rich-content .section-label:first-child { margin-top: 0; }
+.ops-field {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 0.5rem 1rem;
+  align-items: baseline;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.ops-field:last-child { border-bottom: none; }
+.ops-field-key {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding-top: 2px;
+}
+.ops-field-val {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+.ops-field-val strong { color: var(--text-primary); font-weight: 500; }
+.urgency-alta  { color: #C0392B !important; font-weight: 600 !important; }
+.urgency-media { color: var(--amber) !important; font-weight: 600 !important; }
+.urgency-baja  { color: #27AE60 !important; font-weight: 600 !important; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-brand">Christian Rojas · Learning Architect</span>
+  <div class="nav-controls">
+    <div class="lang-switch">
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('es')">ES</button>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">◐</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="eyebrow">CASE STUDY 04</p>
+  <h1 class="hero-title" data-en="Autonomous <em>Post-Learning</em> Intelligence" data-es="Inteligencia <em>Post-Aprendizaje</em> Autónoma">
+    Autonomous <em>Post-Learning</em> Intelligence
+  </h1>
+  <p class="hero-desc" 
+     data-en="An end-to-end pipeline that ingests training data, calculates educational ROI, and distributes multi-stakeholder reports — automatically, within minutes of course completion."
+     data-es="Un pipeline end-to-end que ingesta datos de formación, calcula el ROI educativo y distribuye reportes multi-stakeholder — automáticamente, minutos después de completar el programa.">
+    An end-to-end pipeline that ingests training data, calculates educational ROI, and distributes multi-stakeholder reports — automatically, within minutes of course completion.
+  </p>
+  <div class="hero-badges">
+    <span class="badge badge-accent">n8n Cloud</span>
+    <span class="badge badge-purple">Google Gemini</span>
+    <span class="badge badge-accent">Supabase</span>
+    <span class="badge badge-amber">ROI Engine</span>
+  </div>
+</section>
+
+<!-- STATS -->
+<div style="padding: 0 2rem;">
+  <div class="stats-row">
+    <div class="stat-cell">
+      <span class="stat-number">100%</span>
+      <span class="stat-label" data-en="Admin efficiency — zero manual lag" data-es="Eficiencia administrativa — sin lag manual">Admin efficiency — zero manual lag</span>
+    </div>
+    <div class="stat-cell">
+      <span class="stat-number">3</span>
+      <span class="stat-label" data-en="Stakeholder channels delivered simultaneously" data-es="Canales de stakeholders entregados simultáneamente">Stakeholder channels simultaneously</span>
+    </div>
+    <div class="stat-cell">
+      <span class="stat-number">&lt;2min</span>
+      <span class="stat-label" data-en="From raw data to distributed reports" data-es="De datos brutos a reportes distribuidos">From raw data to distributed reports</span>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIG SECTION -->
+<section class="section">
+  <div class="section-inner">
+    <p class="eyebrow" data-en="INTERACTIVE DEMO" data-es="DEMO INTERACTIVO">INTERACTIVE DEMO</p>
+    <h2 class="section-title" data-en="Configure the program parameters" data-es="Configura los parámetros del programa">Configure the program parameters</h2>
+    <p class="section-desc" 
+       data-en="Adjust scores and KPIs to simulate different program outcomes. The system will calculate ROI and generate all four stakeholder reports."
+       data-es="Ajusta scores y KPIs para simular distintos resultados de programa. El sistema calculará el ROI y generará los cuatro reportes.">
+      Adjust scores and KPIs to simulate different program outcomes. The system will calculate ROI and generate all four stakeholder reports.
+    </p>
+
+    <div class="config-panel">
+      <!-- Sliders -->
+      <div class="config-grid">
+        <div class="field-group">
+          <label class="field-label">
+            <span data-en="Satisfaction Score" data-es="Score de Satisfacción">Satisfaction Score</span>
+            <span class="field-value" id="val-satisfaction">72</span>
+          </label>
+          <input type="range" min="0" max="100" value="72" id="sl-satisfaction"
+            oninput="document.getElementById('val-satisfaction').textContent=this.value" />
+          <p class="field-hint" data-en="Participant perception of training quality and relevance." data-es="Percepción del participante sobre la calidad y relevancia del programa.">Participant perception of training quality and relevance.</p>
+        </div>
+        <div class="field-group">
+          <label class="field-label">
+            <span data-en="Evaluation Score" data-es="Score de Evaluación">Evaluation Score</span>
+            <span class="field-value" id="val-eval">68</span>
+          </label>
+          <input type="range" min="0" max="100" value="68" id="sl-eval"
+            oninput="document.getElementById('val-eval').textContent=this.value" />
+          <p class="field-hint" data-en="Post-training performance assessment. The delta vs. Satisfaction drives ROI." data-es="Evaluación de desempeño post-formación. El delta vs. Satisfacción impulsa el ROI.">Post-training performance assessment. The delta vs. Satisfaction drives ROI.</p>
+        </div>
+        <div class="field-group">
+          <label class="field-label">
+            <span data-en="KPI — Productivity %" data-es="KPI — Productividad %">KPI — Productivity %</span>
+            <span class="field-value" id="val-productivity">15</span>
+          </label>
+          <input type="range" min="0" max="50" value="15" id="sl-productivity"
+            oninput="document.getElementById('val-productivity').textContent=this.value" />
+          <p class="field-hint" data-en="Expected productivity gain tied to this training program." data-es="Ganancia de productividad esperada vinculada a este programa de formación.">Expected productivity gain tied to this training program.</p>
+        </div>
+        <div class="field-group">
+          <label class="field-label">
+            <span data-en="KPI — Retention %" data-es="KPI — Retención %">KPI — Retention %</span>
+            <span class="field-value" id="val-retention">8</span>
+          </label>
+          <input type="range" min="0" max="30" value="8" id="sl-retention"
+            oninput="document.getElementById('val-retention').textContent=this.value" />
+          <p class="field-hint" data-en="Reduction in staff turnover attributed to this program." data-es="Reducción de rotación de personal atribuida a este programa.">Reduction in staff turnover attributed to this program.</p>
+        </div>
+      </div>
+
+      <!-- Stakeholder -->
+      <p class="field-label" style="margin-bottom:0.75rem;" data-en="Primary Stakeholder" data-es="Stakeholder Primario">Primary Stakeholder</p>
+      <div class="stakeholder-row">
+        <button class="stakeholder-btn active" data-value="csuite" onclick="selectStakeholder(this)">
+          C-Suite
+          <span class="stakeholder-sub" data-en="Strategic · Gmail" data-es="Estratégico · Gmail">Strategic · Gmail</span>
+        </button>
+        <button class="stakeholder-btn" data-value="instructor" onclick="selectStakeholder(this)">
+          <span data-en="Instructor" data-es="Instructor">Instructor</span>
+          <span class="stakeholder-sub" data-en="Pedagogical · Notion" data-es="Pedagógico · Notion">Pedagogical · Notion</span>
+        </button>
+        <button class="stakeholder-btn" data-value="ops" onclick="selectStakeholder(this)">
+          <span data-en="Operations" data-es="Operaciones">Operations</span>
+          <span class="stakeholder-sub" data-en="Operational · Teams" data-es="Operacional · Teams">Operational · Teams</span>
+        </button>
+      </div>
+
+      <!-- Generate -->
+      <button class="generate-btn" id="gen-btn" onclick="generateReports()">
+        <span id="gen-btn-text" data-en="Generate Intelligence Reports →" data-es="Generar Reportes de Inteligencia →">Generate Intelligence Reports →</span>
+      </button>
+
+      <!-- Processing -->
+      <div class="processing-bar" id="processing-bar">
+        <div class="spinner"></div>
+        <div>
+          <p class="processing-text" id="processing-text" data-en="Processing training data..." data-es="Procesando datos de formación...">Processing training data...</p>
+          <p class="processing-step" id="processing-step">n8n → Gemini → Supabase</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTPUT SECTION -->
+<section class="output-section" id="output-section">
+  <div class="output-inner">
+    <p class="eyebrow" data-en="GENERATED REPORTS" data-es="REPORTES GENERADOS">GENERATED REPORTS</p>
+    <h2 class="section-title" style="margin-bottom:2rem;" data-en="Intelligence distributed across 3 channels" data-es="Inteligencia distribuida en 3 canales">Intelligence distributed across 3 channels</h2>
+
+    <!-- Tabs -->
+    <div class="tabs-header" id="tabs-header">
+      <button class="tab-btn active" id="tab-btn-executive" onclick="switchTab('executive', this)">
+        <span class="tab-icon">📊</span>
+        <span data-en="Executive Report" data-es="Reporte Ejecutivo">Executive Report</span>
+        <span class="tab-primary-dot"></span>
+      </button>
+      <button class="tab-btn" id="tab-btn-roi" onclick="switchTab('roi', this)">
+        <span class="tab-icon">📈</span>
+        <span data-en="ROI Analysis" data-es="Análisis ROI">ROI Analysis</span>
+        <span class="tab-primary-dot"></span>
+      </button>
+      <button class="tab-btn" id="tab-btn-pedagogical" onclick="switchTab('pedagogical', this)">
+        <span class="tab-icon">🎓</span>
+        <span data-en="Pedagogical Audit" data-es="Auditoría Pedagógica">Pedagogical Audit</span>
+        <span class="tab-primary-dot"></span>
+      </button>
+      <button class="tab-btn" id="tab-btn-ops" onclick="switchTab('ops', this)">
+        <span class="tab-icon">⚡</span>
+        <span data-en="Ops Alert" data-es="Alerta Ops">Ops Alert</span>
+        <span class="tab-primary-dot"></span>
+      </button>
+    </div>
+
+    <!-- Tab: Executive Report -->
+    <div class="tab-panel active" id="tab-executive">
+      <span class="channel-badge channel-gmail">✉ Delivered via Gmail</span>
+      <div class="report-frame" id="executive-report-content"></div>
+    </div>
+
+    <!-- Tab: ROI -->
+    <div class="tab-panel" id="tab-roi">
+      <span class="channel-badge channel-notion">◈ <span data-en="Synced to Notion" data-es="Sincronizado con Notion">Synced to Notion</span></span>
+      <div class="roi-grid">
+        <div class="roi-card">
+          <p class="roi-card-label" data-en="Total ROI" data-es="ROI Total">Total ROI</p>
+          <p class="roi-card-value" id="roi-total">—</p>
+          <p class="roi-card-sub" data-en="Weighted composite index" data-es="Índice compuesto ponderado">Weighted composite index</p>
+        </div>
+        <div class="roi-card">
+          <p class="roi-card-label" data-en="Score Delta" data-es="Delta de Score">Score Delta</p>
+          <p class="roi-card-value" id="roi-delta">—</p>
+          <p class="roi-card-sub" data-en="Eval vs. Satisfaction gap" data-es="Brecha Eval vs. Satisfacción">Eval vs. Satisfaction gap</p>
+        </div>
+      </div>
+      <div class="roi-bars" id="roi-bars"></div>
+      <div style="margin-top:1.5rem;">
+        <div class="report-frame" id="executive-summary-content"></div>
+      </div>
+    </div>
+
+    <!-- Tab: Pedagogical -->
+    <div class="tab-panel" id="tab-pedagogical">
+      <span class="channel-badge channel-notion">◈ <span data-en="Auto-populated in Notion" data-es="Auto-poblado en Notion">Auto-populated in Notion</span></span>
+      <div class="audit-block" id="pedagogical-audit-content"></div>
+    </div>
+
+    <!-- Tab: Ops -->
+    <div class="tab-panel" id="tab-ops">
+      <span class="channel-badge channel-teams">⚡ <span data-en="Sent via MS Teams" data-es="Enviado vía MS Teams">Sent via MS Teams</span></span>
+      <div class="ops-card">
+        <div class="ops-urgency-row">
+          <div class="urgency-dot"></div>
+          <span class="urgency-label" data-en="Real-time Operational Alert" data-es="Alerta Operacional en Tiempo Real">Real-time Operational Alert</span>
+        </div>
+        <div class="ops-body" id="ops-alert-content"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section class="arch-section">
+  <div class="arch-inner">
+    <p class="eyebrow" data-en="TECHNICAL ARCHITECTURE" data-es="ARQUITECTURA TÉCNICA">TECHNICAL ARCHITECTURE</p>
+    <h2 class="section-title" style="margin-bottom:0.5rem;" data-en="End-to-end orchestration" data-es="Orquestación end-to-end">End-to-end orchestration</h2>
+    <p class="section-desc" data-en="From webhook trigger to distributed reports across Gmail, Notion, and Teams." data-es="Del webhook trigger a reportes distribuidos en Gmail, Notion y Teams.">From webhook trigger to distributed reports across Gmail, Notion, and Teams.</p>
+
+    <div class="arch-flow">
+      <div class="arch-node">
+        <div class="arch-icon">🌐</div>
+        <span class="arch-name">Webhook</span>
+      </div>
+      <div class="arch-arrow"></div>
+      <div class="arch-node">
+        <div class="arch-icon">⚙️</div>
+        <span class="arch-name">JS Logic Gate</span>
+      </div>
+      <div class="arch-arrow"></div>
+      <div class="arch-node">
+        <div class="arch-icon highlight" style="font-size:18px; color:#fff;">G</div>
+        <span class="arch-name">Gemini LLM</span>
+      </div>
+      <div class="arch-arrow"></div>
+      <div class="arch-node">
+        <div class="arch-icon">🗄️</div>
+        <span class="arch-name">Supabase</span>
+      </div>
+      <div class="arch-arrow"></div>
+      <div class="arch-node">
+        <div class="arch-icon">✉️</div>
+        <span class="arch-name">Gmail</span>
+      </div>
+      <div class="arch-arrow"></div>
+      <div class="arch-node">
+        <div class="arch-icon">◈</div>
+        <span class="arch-name">Notion</span>
+      </div>
+      <div class="arch-arrow"></div>
+      <div class="arch-node">
+        <div class="arch-icon">⚡</div>
+        <span class="arch-name">MS Teams</span>
+      </div>
+    </div>
+
+    <!-- What happens next -->
+    <p class="eyebrow" style="margin-top:3rem;" data-en="WHAT HAPPENS NEXT" data-es="QUÉ PASA DESPUÉS">WHAT HAPPENS NEXT</p>
+    <div class="next-grid">
+      <div class="next-card">
+        <div class="next-card-icon">✉</div>
+        <p class="next-card-title" data-en="C-Suite receives the report" data-es="El C-Suite recibe el reporte">C-Suite receives the report</p>
+        <p class="next-card-desc" data-en="An HTML executive report lands in the Director's inbox with strategic next steps and ROI validation." data-es="Un reporte ejecutivo HTML llega al inbox del Director con próximos pasos estratégicos y validación de ROI.">An HTML executive report lands in the Director's inbox with strategic next steps and ROI validation.</p>
+      </div>
+      <div class="next-card">
+        <div class="next-card-icon">◈</div>
+        <p class="next-card-title" data-en="Notion audit is populated" data-es="La auditoría de Notion se pobla">Notion audit is populated</p>
+        <p class="next-card-desc" data-en="The pedagogical audit auto-populates a Notion database entry, becoming a living repository for instructional refinement." data-es="La auditoría pedagógica auto-puebla una entrada en Notion, creando un repositorio vivo para el refinamiento instruccional.">The pedagogical audit auto-populates a Notion database entry for instructional refinement.</p>
+      </div>
+      <div class="next-card">
+        <div class="next-card-icon">⚡</div>
+        <p class="next-card-title" data-en="Teams alert fires instantly" data-es="La alerta de Teams se dispara">Teams alert fires instantly</p>
+        <p class="next-card-desc" data-en="Operations teams receive a real-time alert with the critical metric, required action, and suggested timeline." data-es="Los equipos operacionales reciben una alerta en tiempo real con la métrica crítica, acción requerida y plazo sugerido.">Operations teams receive a real-time alert with the critical metric and required action.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p class="footer-stack">n8n Cloud · Google Gemini · Supabase · HTML/CSS/JS · GitHub Pages</p>
+</footer>
+
+<script>
+// ── STATE ──
+let currentLang = 'en';
+let currentStakeholder = 'csuite';
+let pollInterval = null;
+
+const SUPABASE_URL = 'https://ntxzddelogsrgvuarbqr.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im50eHpkZGVsb2dzcmd2dWFyYnFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzA4NTMsImV4cCI6MjA5NzQwNjg1M30.8b99CuDbh77ENfcxFNEVTDKduvWJgEc3aAHhLXxy_iE';
+const WEBHOOK_URL  = 'https://christian-rojas.app.n8n.cloud/webhook/autonomous-intelligence';
+
+const PROGRAM_NAMES = {
+  csuite:     'Leadership Essentials Q1',
+  instructor: 'Advanced Sales Skills Program',
+  ops:        'Cybersecurity Awareness Cohort'
+};
+
+const PROCESSING_STEPS = {
+  en: ['Ingesting training data...', 'Calculating educational ROI...', 'Generating stakeholder reports...', 'Distributing across channels...'],
+  es: ['Ingistando datos de formación...', 'Calculando ROI educativo...', 'Generando reportes multi-stakeholder...', 'Distribuyendo en canales...']
+};
+
+// ── LANG ──
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent === lang.toUpperCase()));
+  document.querySelectorAll('[data-en]').forEach(el => {
+    const val = el.getAttribute('data-' + lang);
+    if (val) el.innerHTML = val;
+  });
+}
+
+// ── THEME ──
+function toggleTheme() {
+  const html = document.documentElement;
+  html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? '' : 'dark');
+}
+
+// ── STAKEHOLDER ──
+function selectStakeholder(btn) {
+  document.querySelectorAll('.stakeholder-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentStakeholder = btn.dataset.value;
+}
+
+// ── TABS ──
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── GENERATE ──
+async function generateReports() {
+  const sessionId = 'demo_' + Date.now();
+  const satisfaction = parseInt(document.getElementById('sl-satisfaction').value);
+  const evalScore    = parseInt(document.getElementById('sl-eval').value);
+  const productivity = parseInt(document.getElementById('sl-productivity').value);
+  const retention    = parseInt(document.getElementById('sl-retention').value);
+
+  // UI: loading state
+  const btn = document.getElementById('gen-btn');
+  btn.disabled = true;
+  document.getElementById('gen-btn-text').textContent = currentLang === 'en' ? 'Generating...' : 'Generando...';
+  document.getElementById('output-section').classList.remove('visible');
+  document.getElementById('processing-bar').classList.add('visible');
+
+  // Animate processing steps
+  let stepIdx = 0;
+  const steps = PROCESSING_STEPS[currentLang];
+  document.getElementById('processing-text').textContent = steps[0];
+  const stepAnim = setInterval(() => {
+    stepIdx = (stepIdx + 1) % steps.length;
+    document.getElementById('processing-text').textContent = steps[stepIdx];
+  }, 2500);
+
+  try {
+    // Fire webhook
+    await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        session_id:         sessionId,
+        program_name:       PROGRAM_NAMES[currentStakeholder] || 'Training Program Q1',
+        satisfaction_score: satisfaction,
+        eval_score:         evalScore,
+        kpi_productivity:   productivity,
+        kpi_retention:      retention,
+        stakeholder_type:   currentStakeholder
+      })
+    });
+
+    // Poll Supabase
+    pollInterval = setInterval(async () => {
+      try {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/demo_runs?session_id=eq.${sessionId}&status=eq.ready&select=*`,
+          { headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` } }
+        );
+        const data = await res.json();
+        if (data && data.length > 0) {
+          clearInterval(pollInterval);
+          clearInterval(stepAnim);
+          renderReports(data[0]);
+        }
+      } catch(e) { /* keep polling */ }
+    }, 2500);
+
+  } catch(err) {
+    clearInterval(stepAnim);
+    document.getElementById('processing-text').textContent = currentLang === 'en' ? 'Error connecting. Try again.' : 'Error de conexión. Intenta de nuevo.';
+    btn.disabled = false;
+    document.getElementById('gen-btn-text').textContent = currentLang === 'en' ? 'Generate Intelligence Reports →' : 'Generar Reportes de Inteligencia →';
+  }
+}
+
+// ── MARKDOWN RENDERER ──
+function renderMarkdown(text) {
+  if (!text) return '';
+  const lines = text.split('\n');
+  const output = [];
+  let listItems = [];
+  let inList = false;
+
+  function flushList() {
+    if (listItems.length) {
+      output.push('<ul>' + listItems.join('') + '</ul>');
+      listItems = [];
+      inList = false;
+    }
+  }
+
+  lines.forEach(line => {
+    // Headers
+    if (/^###\s+/.test(line)) {
+      flushList();
+      output.push('<h3>' + line.replace(/^###\s+/, '') + '</h3>');
+      return;
+    }
+    if (/^##\s+/.test(line)) {
+      flushList();
+      output.push('<h2>' + line.replace(/^##\s+/, '') + '</h2>');
+      return;
+    }
+    // Numbered list: "1. text" or "1.  text"
+    const numMatch = line.match(/^\d+\.\s+(.+)$/);
+    if (numMatch) {
+      listItems.push('<li>' + applyInline(numMatch[1]) + '</li>');
+      inList = true;
+      return;
+    }
+    // Bullet list: "* text" or "- text"
+    const bulletMatch = line.match(/^[\*\-]\s+(.+)$/);
+    if (bulletMatch) {
+      listItems.push('<li>' + applyInline(bulletMatch[1]) + '</li>');
+      inList = true;
+      return;
+    }
+    // Empty line
+    if (!line.trim()) {
+      flushList();
+      return;
+    }
+    // Regular line
+    flushList();
+    // Skip lines that look like "SECTION_NAME: Title" headers Gemini sometimes adds
+    if (/^[A-Z_]+:\s/.test(line) && line.length < 80) {
+      output.push('<p class="section-label">' + applyInline(line) + '</p>');
+      return;
+    }
+    output.push('<p>' + applyInline(line) + '</p>');
+  });
+
+  flushList();
+  return output.join('');
+}
+
+function applyInline(text) {
+  // Bold **text**
+  text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  // Single *text* italic (not part of bold)
+  text = text.replace(/(?<!\*)\*(?!\*)([^*]+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
+  return text;
+}
+
+// ── OPS ALERT RENDERER ──
+function renderOpsAlert(text) {
+  if (!text) return '';
+  const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+  const keyPatterns = ['URGENCIA', 'URGENCY', 'METRICA', 'METRIC', 'ACCION', 'ACTION', 'PLAZO', 'TIMELINE', 'SUGGESTED'];
+  const fields = [];
+  let cur = null;
+
+  lines.forEach(line => {
+    const ci = line.indexOf(':');
+    if (ci > 0 && ci < 40) {
+      const rawKey = line.substring(0, ci).trim().replace(/\*\*/g, '').trim();
+      const k = rawKey.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      if (keyPatterns.some(p => k.includes(p))) {
+        if (cur) fields.push(cur);
+        cur = { key: line.substring(0, ci).trim().replace(/\*\*/g, '').trim(), val: line.substring(ci + 1).trim() };
+        return;
+      }
+    }
+    if (cur) cur.val += ' ' + line;
+    else fields.push({ key: '', val: line });
+  });
+  if (cur) fields.push(cur);
+
+  if (!fields.length) return '<p style="color:var(--text-secondary);font-size:0.92rem;">' + text + '</p>';
+
+  return fields.map(f => {
+    if (!f.key) return '<p style="color:var(--text-secondary);font-size:0.92rem;margin-bottom:0.5rem;">' + f.val + '</p>';
+    let cls = '';
+    const kUp = f.key.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const vUp = f.val.toUpperCase();
+    if (kUp.includes('URGENCIA') || kUp.includes('URGENCY')) {
+      if (vUp.includes('ALTA') || vUp.includes('HIGH')) cls = 'urgency-alta';
+      else if (vUp.includes('MEDIA') || vUp.includes('MEDIUM')) cls = 'urgency-media';
+      else if (vUp.includes('BAJA') || vUp.includes('LOW')) cls = 'urgency-baja';
+    }
+    const valHtml = cls ? f.val : renderMarkdown(f.val);
+    return '<div class="ops-field"><span class="ops-field-key">' + f.key + '</span><span class="ops-field-val ' + cls + '">' + valHtml + '</span></div>';
+  }).join('');
+}
+
+// ── RENDER ──
+function renderReports(row) {
+  // Hide processing
+  document.getElementById('processing-bar').classList.remove('visible');
+  const btn = document.getElementById('gen-btn');
+  btn.disabled = false;
+  document.getElementById('gen-btn-text').textContent = currentLang === 'en' ? 'Generate Intelligence Reports →' : 'Generar Reportes de Inteligencia →';
+
+  // Executive report — HTML from Gemini with rich-content styles
+  const execEl = document.getElementById('executive-report-content');
+  execEl.classList.add('rich-content');
+  execEl.innerHTML = row.executive_report || '';
+
+  // ROI
+  const roi = row.roi_breakdown || {};
+  document.getElementById('roi-total').textContent = (row.roi_calculated || 0) + 'x';
+  document.getElementById('roi-delta').textContent = ((roi.score_delta || 0) * 100).toFixed(1) + '%';
+
+  const barsData = [
+    { label: currentLang === 'en' ? 'Productivity weight' : 'Peso productividad', val: roi.weighted_productivity || 0, max: 1 },
+    { label: currentLang === 'en' ? 'Retention weight'   : 'Peso retención',     val: roi.weighted_retention   || 0, max: 0.6 },
+    { label: currentLang === 'en' ? 'Score delta'        : 'Delta de score',      val: roi.score_delta          || 0, max: 1 }
+  ];
+  document.getElementById('roi-bars').innerHTML = barsData.map(b => `
+    <div class="roi-bar-row">
+      <span class="roi-bar-label">${b.label}</span>
+      <div class="roi-bar-track">
+        <div class="roi-bar-fill" style="width:${Math.min(100, (b.val / b.max) * 100)}%"></div>
+      </div>
+      <span class="roi-bar-val">${b.val.toFixed(2)}</span>
+    </div>
+  `).join('');
+
+  // Executive summary in ROI tab
+  document.getElementById('executive-summary-content').innerHTML = '<p style="font-size:1rem;color:var(--text-primary);line-height:1.8;">' + renderMarkdown(row.executive_summary || '') + '</p>';
+
+  // Pedagogical — render markdown
+  const audEl = document.getElementById('pedagogical-audit-content');
+  audEl.classList.add('rich-content');
+  audEl.innerHTML = renderMarkdown(row.pedagogical_audit || '');
+
+  // Ops — structured render
+  document.getElementById('ops-alert-content').innerHTML = renderOpsAlert(row.ops_alert || '');
+
+  // Route to primary tab based on stakeholder
+  const primaryTabMap = {
+    csuite:     'executive',
+    instructor: 'pedagogical',
+    ops:        'ops'
+  };
+  const primaryTab = primaryTabMap[currentStakeholder] || 'executive';
+
+  // Mark primary tab with dot indicator
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('primary-tab'));
+  const primaryBtn = document.getElementById('tab-btn-' + primaryTab);
+  if (primaryBtn) primaryBtn.classList.add('primary-tab');
+
+  // Switch to primary tab
+  switchTab(primaryTab, primaryBtn);
+
+  // Show output
+  document.getElementById('output-section').classList.add('visible');
+  document.getElementById('output-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>
